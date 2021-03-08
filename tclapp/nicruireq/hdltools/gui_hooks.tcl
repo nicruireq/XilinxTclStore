@@ -86,14 +86,15 @@ proc ::tclapp::nicruireq::hdltools::gui_run-vhdl_get_testbench_template {} {
     # generate template
     set project_dir [get_property DIRECTORY [current_project]]
     set sim_1_path "$project_dir/[current_project].srcs/sim_1/new"
+    # add template file to project simulation fileset sim_1
+    file mkdir $sim_1_path
     if {[catch {
         set template_path [vhdl_get_template \
             $selected_vhd $sim_1_path "-tb"]
     } template_error]} {
         error " Error - generating template failed: $template_error"
     }
-    # add template file to project simulation fileset sim_1,
-    file mkdir $sim_1_path
+
     if {[regexp {\s+} $template_path]} {
         # if the dir string has spaces we need to eval
         # the command with the dir between double {{}}
