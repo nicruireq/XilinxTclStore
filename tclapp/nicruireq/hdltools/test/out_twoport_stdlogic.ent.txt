@@ -1,0 +1,6 @@
+component mock is
+    Port (
+           A : out STD_LOGIC;
+           B : in STD_LOGIC
+        );
+end component;

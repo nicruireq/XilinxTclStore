@@ -1,0 +1,12 @@
+my_ram_wf_93 : RAM_WF_93
+	generic map(
+		datafile => ,
+		address_width => ,
+		data_width => )
+	port map(
+		DataIn => ,
+		WE => ,
+		Address => ,
+		CLK => ,
+		DataOut => );
+

@@ -1,0 +1,537 @@
+###############################################################################
+#
+# test_vhdl_utils.test
+#
+# Script created on JANUARY 2021 by Nicolas Ruiz Requejo
+#
+# https://github.com/nicruireq
+#
+###############################################################################
+
+#==================================================#
+#   TEST for extract_entity                        #
+#==================================================#
+
+test extract_entity-invalid_data_return_false-1.0 {
+    extract_entity returns false with no entity text 
+} -setup {
+    set in_text {The result attribute supplies the 
+                 expectedValue against which the return 
+                 value from script will be compared. The 
+                 default value is an empty string.}
+} -body {
+    ::tclapp::nicruireq::hdltools::vhdl_utils::extract_entity in_text
+} -result 0
+
+
+test extract_entity-array_correct_entities-1.0 {
+    extract_entity extracts all the entity
+} -setup {
+    set file1 [open "RAM_WF_93.vhd" "r"]
+    set entity1 [read $file1]
+    set name1 "RAM_WF_93"
+    set f2 [open "RAM_WF_93.ent.txt" "r"]
+    set e1 [read $f2]
+} -body {
+    if {[::tclapp::nicruireq::hdltools::vhdl_utils::extract_entity $entity1] == 1} {
+        puts "\nExpected entity:\n$e1\nsize: [string length [string trim $e1]]"
+        set retname [string compare -nocase $name1 $::tclapp::nicruireq::hdltools::vhdl_utils::entity_name]
+        set retent [string compare -nocase \
+                        [string trim $e1]  \
+                        [string trim $::tclapp::nicruireq::hdltools::vhdl_utils::entity]]
+        puts "\nExtracted entity:\n$::tclapp::nicruireq::hdltools::vhdl_utils::entity\n\nsize: [string length [string trim $::tclapp::nicruireq::hdltools::vhdl_utils::entity]]"
+        if {($retname == 0) && ($retent == 0)} {
+            return 1
+        } else {
+            return 0
+        }
+    } else {
+        return 0
+    }
+} -result 1
+
+
+test extract_entity-empty_entity_returns_true-1.0 {
+    extract_entity extracts entity name and void entity from \
+    empty entity text
+} -setup {
+    set name "example1"
+    set ent "entity example1 is\nend example1;\n\narchitecture behaviour of example1\n"
+} -body {
+    if {[::tclapp::nicruireq::hdltools::vhdl_utils::extract_entity $ent] == 1} {
+        set retname [string compare \
+                $::tclapp::nicruireq::hdltools::vhdl_utils::entity_name \
+                $name]
+        set retent [string compare \
+                [string trim $::tclapp::nicruireq::hdltools::vhdl_utils::entity] \
+                [string trim "entity example1 is\nend example1\;"]]
+        if {($retname == 0) && ($retent == 0)} {
+            return 1
+        } else {
+            return 0
+        }
+    } else {
+        return 0
+    }
+} -result 1
+
+
+#==================================================#
+#   TEST for generate_component                    #
+#==================================================#
+
+test generate_component-not_entity_returns_false-1.0 {
+    generate_component with input text is not being an \
+    entity returns false
+} -setup {
+    set input {The minister said that the issue \
+               of officials will be safeguarded, \
+               and it is not being an easy process, \
+               but we will carry out and safeguard \
+               all the objectives outlined}
+} -body {
+    ::tclapp::nicruireq::hdltools::vhdl_utils::generate_component $input
+} -result 0
+
+
+test generate_component-entity_1_port_std_logic-1.0 {
+    generate_component extracts component of entity with \
+    1 port std_logic
+} -setup {
+    set input [load_mock_file "mock_oneport_stdlogic.ent.txt"]
+    set out  [load_mock_file "out_oneport_stdlogic.ent.txt"]
+} -body {
+    set retval [::tclapp::nicruireq::hdltools::vhdl_utils::generate_component $input]
+    set retent [string equal -nocase \
+                [string trim $::tclapp::nicruireq::hdltools::vhdl_utils::tp_component] \
+                [string trim $out]
+    ]
+    puts "Expected output:\n$out\n"
+    puts "Real output:\n$::tclapp::nicruireq::hdltools::vhdl_utils::tp_component"
+    if {($retval == 1) && ($retent == 1)} {
+        return 1
+    } else {
+        return 0
+    }
+} -result 1
+
+
+test generate_component-entity_2_port_std_logic-1.0 {
+    generate_component extracts component of entity with \
+    2 port std_logic
+} -setup {
+    set input [load_mock_file "mock_twoport_stdlogic.ent.txt"]
+    set out  [load_mock_file "out_twoport_stdlogic.ent.txt"]
+} -body {
+    set retval [::tclapp::nicruireq::hdltools::vhdl_utils::generate_component $input]
+    set retent [string equal -nocase \
+                [string trim $::tclapp::nicruireq::hdltools::vhdl_utils::tp_component] \
+                [string trim $out]
+    ]
+    puts "Expected output:\n$out\n"
+    puts "Real output:\n$::tclapp::nicruireq::hdltools::vhdl_utils::tp_component"
+    if {($retval == 1) && ($retent == 1)} {
+        return 1
+    } else {
+        return 0
+    }
+} -result 1
+
+
+test generate_component-entity_2_port_slv_start_end-1.0 {
+    generate_component extracts component of entity with \
+    2 port SLV in start and end of ports list
+} -setup {
+    set input [load_mock_file "mock_ports_slv1.ent.txt"]
+    set out  [load_mock_file "out_ports_slv1.ent.txt"]
+} -body {
+    set retval [::tclapp::nicruireq::hdltools::vhdl_utils::generate_component $input]
+    set retent [string equal -nocase \
+                [string trim $::tclapp::nicruireq::hdltools::vhdl_utils::tp_component] \
+                [string trim $out]
+    ]
+    puts "Expected output:\n$out\n"
+    puts "Real output:\n$::tclapp::nicruireq::hdltools::vhdl_utils::tp_component"
+    if {($retval == 1) && ($retent == 1)} {
+        return 1
+    } else {
+        return 0
+    }
+} -result 1
+
+
+test generate_component-entity_2_port_slv-1.0 {
+    generate_component extracts component of entity with \
+    only 2 port SLV in port list
+} -setup {
+    set input [load_mock_file "mock_ports_slv2.ent.txt"]
+    set out  [load_mock_file "out_ports_slv2.ent.txt"]
+} -body {
+    set retval [::tclapp::nicruireq::hdltools::vhdl_utils::generate_component $input]
+    set retent [string equal -nocase \
+                [string trim $::tclapp::nicruireq::hdltools::vhdl_utils::tp_component] \
+                [string trim $out]
+    ]
+    puts "Expected output:\n$out\n"
+    puts "Real output:\n$::tclapp::nicruireq::hdltools::vhdl_utils::tp_component"
+    if {($retval == 1) && ($retent == 1)} {
+        return 1
+    } else {
+        return 0
+    }
+} -result 1
+
+
+test generate_component-entity_no_port_list-1.0 {
+    generate_component returns TRUE with empty por list entity
+} -setup {
+    set input "entity mock is\nend mock;"
+} -body {
+    ::tclapp::nicruireq::hdltools::vhdl_utils::generate_component $input
+} -result 1
+
+
+#==================================================#
+#   TEST for generate_instantiation_template       #
+#==================================================#
+
+test generate_instantiation_template-input_not_entity-1.0 {
+    generate_instantiation_template returns FALSE with input \
+    that is not an entity
+} -setup {
+    set name "mock"
+    set ent {Please write your code so that \
+             it conforms to the conventions \
+             from the very start.}
+} -body {
+    ::tclapp::nicruireq::hdltools::vhdl_utils::generate_instantiation_template $ent $name
+} -result 0
+
+
+test generate_instantiation_template-empty_string-1.0 {
+    generate_instantiation_template returns FALSE when \
+    input is empty string
+} -setup {
+    set name "mock"
+    set ent {}
+} -body {
+    ::tclapp::nicruireq::hdltools::vhdl_utils::generate_instantiation_template $ent $name
+} -result 0
+
+
+test generate_instantiation_template-array_correct_mocks_passed-1.0 {
+    generate_instantiation_template generates correct \
+    instantiation templates with several correct mocks \
+    and returns TRUE
+} -setup {
+    clean_vars_namespaces
+    set names [list "mock" "mock" "RAM_WF_93"]
+    set entitys [list \
+        [load_mock_file "mock_ports_slv1.ent.txt"] \
+        [load_mock_file "mock_only_generic.ent.txt"] \
+        [load_mock_file "RAM_WF_93.ent.txt"] ]
+    # REMEMBER an empty list is [list], [list] != [list {}]
+    set ports_names [list \
+        [list A B C D] \
+        [list] \
+        [list {DataIn} {WE} {Address} {DataOut} {CLK}] ]
+    set ports_types [list \
+        [list {out STD_LOGIC_VECTOR(3 downto 0)} \
+              {in STD_LOGIC} {out STD_LOGIC} \
+              {in STD_LOGIC_VECTOR(7 downto 0)}] \
+        [list] \
+        [list {in  std_logic_vector(data_width-1 downto 0)} \
+              {in  std_logic} \
+              {in  std_logic_vector(address_width-1 downto 0)} \
+              {out  std_logic_vector(data_width-1 downto 0)} \
+              {in  std_logic}] ]
+    set has_generics [list 0 1 1]
+    # boolean foreach mock being tested
+    set oks [list 0 0 0]
+} -body {
+    for {set i 0} {$i < [llength $entitys]} {incr i} {
+    puts "FOR MOCK $i:\n"
+        set val_proc [::tclapp::nicruireq::hdltools::vhdl_utils::generate_instantiation_template \
+            [lindex $entitys $i] [lindex $names $i] ]
+    puts "val_proc = $val_proc"
+        set val_port_names [lequal [lindex $ports_names $i] \
+                $::tclapp::nicruireq::hdltools::vhdl_utils::ports_names]
+    puts "val_port_names = $val_port_names"
+        set val_port_types [lequal [lindex $ports_types $i] \
+                $::tclapp::nicruireq::hdltools::vhdl_utils::ports_types]
+    puts "val_port_types = $val_port_types"
+        set val_has_generic [expr {[lindex $has_generics $i] == \
+                $::tclapp::nicruireq::hdltools::vhdl_utils::has_generic_list}]
+    puts "val_has_generic = $val_has_generic"
+        puts "Generated insttp for mock: $i\n"
+        puts "$::tclapp::nicruireq::hdltools::vhdl_utils::tp_instantiation"
+        set oks [lreplace $oks $i $i [expr { \
+                    $val_proc && $val_port_names && \
+                    $val_port_types && $val_has_generic}]]
+        clean_vars_namespaces
+    }
+    # all oks 1s => passed
+    foreach o $oks {
+        if {$o != 1} {
+            return 0
+        }
+    }
+    return 1
+} -result 1
+
+
+test make_full_instantiation_template-returns_not_empty_template-1.0 {
+    make_full_instantiation_template Returns formatted instantiation \
+    template
+} -setup {
+    set comptp [load_mock_file "RAM_WF_93.cmp.txt"]
+    set insttp [load_mock_file "RAM_WF_93.insttp.txt"]
+} -body {
+    set fulltemp [
+        ::tclapp::nicruireq::hdltools::vhdl_utils::make_full_instantiation_template \
+            $comptp $insttp
+    ]
+    puts "FULL INSTANTIATION TEMPLATE GENERATED:\n$fulltemp"
+    return [expr {[string length $fulltemp] > 0}]
+} -result 1
+
+
+#==================================================#
+#   TEST for write_to_file                         #
+#==================================================#
+
+test write_to_file-creates_expected_file-1.0 {
+    write_to_file creates the expected file
+} -setup {
+    # for example ...
+    set text [load_mock_file "RAM_WF_93.insttp.txt"]
+    set path_source {.}
+    makeDirectory {tmp} "./"
+    set path_out "./tmp"
+    set tail {_tp.vho}
+} -body {
+    file exists [::tclapp::nicruireq::hdltools::vhdl_utils::write_to_file \
+        $path_source $path_out $text $tail]
+} -cleanup {
+    removeDirectory {tmp} "./"
+} -result 1 
+
+
+#==================================================#
+#   TEST get_template (instantiation templates)    #
+#==================================================#
+
+test get_template-file_without_entity_throw_error-1.0 {
+    get_template throw error when source file does not \
+    contain vhdl entity
+} -setup {
+    set filepath "./mock_no_entity.vhd"
+} -body {
+    ::tclapp::nicruireq::hdltools::vhdl_utils::get_template \
+        $filepath {./} -tp
+} -returnCodes {error} -result {The entity declaration could not be recognized in the file : ./mock_no_entity.vhd}
+
+
+test get_template-correct_vhdl_input_success-1.0 {
+    get_template generate templates .vho files \
+    from a set of correct vhdl files
+} -setup {
+    set mocks [list "./FDD1.vhd" "./only_generic.vhd" "./RAM_WF_93.vhd"]
+    makeDirectory "tmp" "./"
+    set devs [list]
+} -body {
+    for {set i 0} {$i < [llength $mocks]} {incr i} {
+        clean_vars_namespaces
+        lappend devs [::tclapp::nicruireq::hdltools::vhdl_utils::get_template \
+            [lindex $mocks $i] {./tmp} -tp]
+        puts "New output file saved in ./tmp directory"
+    }
+    puts "DEBUG:\n\n$devs"
+    set testval 1
+    foreach v $devs {
+        set testval [expr {([string length $v] > 0) && $testval}]
+    }
+    return $testval
+} -result 1
+
+
+#==================================================#
+#   TEST for clock_reset_exists_and_extract        #
+#==================================================#
+
+test clock_reset_exists_and_extract-input_is_not_clocked_returns_false-1.0 {
+    clock_reset_exists_and_extract returns FALSE and don't extract \
+    clock and reset with input is not clocked design
+} -setup {
+    set notclocked [load_mock_file "NOR_GATE.vhd"]
+    set retval 1
+    clean_vars_namespaces
+} -body {
+    ::tclapp::nicruireq::hdltools::vhdl_utils::clock_reset_exists_and_extract \
+        $notclocked
+    
+    if {$::tclapp::nicruireq::hdltools::vhdl_utils::is_clocked != 0} {
+        set retval 1
+    }
+    set retval [info exists $::tclapp::nicruireq::hdltools::vhdl_utils::clock_name]
+    set retval [info exists $::tclapp::nicruireq::hdltools::vhdl_utils::reset_name]
+    return $retval
+} -result 0
+
+
+test clock_reset_exists_and_extract-detect_and_extract_clock_reset-1.0 {
+    clock_reset_exists_and_extract Test if detect and extracts clock \
+    and reset signals from a set of clocked designs
+} -setup {
+    set clkname "clock"
+    set rstname "reset"
+    set mocks [list \
+            [load_mock_file "FDD1.vhd"] \
+            [load_mock_file "FDD2.vhd"] \
+            [load_mock_file "FDD3.vhd"] \
+            [load_mock_file "FDD4.vhd"]]
+    set retvals [list]
+} -body {
+    puts "Values:    is_clocked      clock_name      reset_name"
+    for {set i 0} {$i < [llength $mocks]} {incr i} {
+        clean_vars_namespaces
+        ::tclapp::nicruireq::hdltools::vhdl_utils::clock_reset_exists_and_extract \
+            [lindex $mocks $i]
+        set devis $::tclapp::nicruireq::hdltools::vhdl_utils::is_clocked
+        set devclk $::tclapp::nicruireq::hdltools::vhdl_utils::clock_name
+        set devrst $::tclapp::nicruireq::hdltools::vhdl_utils::reset_name
+        puts "mock $i returns: $devis    $devclk    $devrst"
+        lappend retvals [ \
+            expr {($devis == 1) && ([string equal $devclk $clkname]) && \
+                  ([string equal $devrst $rstname])}]
+    }
+    set retend 1
+    foreach v $retvals {
+        set retend [expr {$retend && $v}]
+    }
+    return $retend
+} -result 1
+
+
+#==================================================#
+#   TEST for make_testbench                        #
+#==================================================#
+
+test make_testbench-clocked_entity_testbench-1.0 {
+    make_testbench returns a valid testbench template \
+    from clocked entity
+} -setup {
+    clean_vars_namespaces
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::entity_name \
+        "RAM_WF_93"
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::tp_component \
+        [load_mock_file "RAM_WF_93.cmp.txt"]
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::ports_names \
+        [list {DataIn} {WE} {Address} {CLK} {DataOut}]
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::ports_types \
+        [list {in  std_logic_vector(data_width-1 downto 0)} \
+              {in  std_logic} \
+              {in  std_logic_vector(address_width-1 downto 0)} \
+              {in  std_logic} \
+              {out  std_logic_vector(data_width-1 downto 0)}]
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::tp_instantiation \
+        [load_mock_file "RAM_WF_93.insttp.txt"]
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::is_clocked 1
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::clock_name "CLK"
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::reset_name ""
+} -body {
+    set tb [::tclapp::nicruireq::hdltools::vhdl_utils::make_testbench {} {}]
+    puts "Generated testbench:"
+    puts "====================\n"
+    puts $tb
+    return [expr {[string length $tb] > 0}]
+} -result  1
+
+
+test make_testbench-entity_no_clock-1.0 {
+    make_testbench returns a valid testbench template \
+    from NON clocked entity
+} -setup {
+    clean_vars_namespaces
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::entity_name \
+        "NOR_GATE"
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::tp_component \
+        {entity NOR_GATE is
+    Port ( A_i : in STD_LOGIC_VECTOR (1 downto 0);
+           B_i : in STD_LOGIC_VECTOR (1 downto 0);
+           Z_o : out STD_LOGIC_VECTOR (1 downto 0));
+end NOR_GATE;}
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::ports_names \
+        [list {A_i} {B_i} {Z_o}]
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::ports_types \
+        [list {in STD_LOGIC_VECTOR (1 downto 0)} \
+              {in STD_LOGIC_VECTOR (1 downto 0)} \
+              {out STD_LOGIC_VECTOR (1 downto 0))}]
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::tp_instantiation \
+        {my_NOR_GATE : NOR_GATE
+    port map(A_i => ,
+        B_i => ,
+        Z_o => );
+        }
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::is_clocked 0
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::clock_name ""
+    set ::tclapp::nicruireq::hdltools::vhdl_utils::reset_name ""
+} -body {
+    set tb [::tclapp::nicruireq::hdltools::vhdl_utils::make_testbench {} {}]
+    puts "Generated testbench:"
+    puts "====================\n"
+    puts $tb
+    return [expr {[string length $tb] > 0}]
+} -result 1
+
+
+#==================================================#
+#   TEST for get_template                          #
+#==================================================#
+
+test get_template-all_templates-1.0 {
+    get_template test -tp and -tb
+} -setup {
+    clean_vars_namespaces
+    set testdir {./tmp1}
+    makeDirectory {./tmp1}
+} -body {
+    set ret1 [::tclapp::nicruireq::hdltools::vhdl_utils::get_template\
+                {./RAM_WF_93.vhd} $testdir -tp]
+    set ret2 [::tclapp::nicruireq::hdltools::vhdl_utils::get_template\
+                {./RAM_WF_93.vhd} $testdir -tb]
+    set ret3 [::tclapp::nicruireq::hdltools::vhdl_utils::get_template\
+                {./NOR_GATE.vhd} $testdir -tp]
+    set ret4 [::tclapp::nicruireq::hdltools::vhdl_utils::get_template\
+                {./NOR_GATE.vhd} $testdir -tb]
+    return [expr {([string length $ret1] > 0) \
+                    && ([string length $ret2] > 0) \
+                    && ([string length $ret3] > 0) \
+                    && ([string length $ret4] > 0)}]
+} -result 1
+
+
+#==================================================#
+#   TEST for vhdl_get_template                     #
+#==================================================#
+
+test vhdl_get_template-all_templates-1.0 {
+    Test wrapper of get_template (-tp and -tb options)
+} -setup {
+    clean_vars_namespaces
+    set testdir {./tmp2}
+    makeDirectory {./tmp2}
+} -body {
+    set ret1 [::tclapp::nicruireq::hdltools::vhdl_get_template\
+                {./RAM_WF_93.vhd} $testdir -tp]
+    set ret2 [::tclapp::nicruireq::hdltools::vhdl_get_template\
+                {./RAM_WF_93.vhd} $testdir -tb]
+    set ret3 [::tclapp::nicruireq::hdltools::vhdl_get_template\
+                {./NOR_GATE.vhd} $testdir -tp]
+    set ret4 [::tclapp::nicruireq::hdltools::vhdl_get_template\
+                {./NOR_GATE.vhd} $testdir -tb]
+    return [expr {([string length $ret1] > 0) \
+                    && ([string length $ret2] > 0) \
+                    && ([string length $ret3] > 0) \
+                    && ([string length $ret4] > 0)}]
+} -result 1

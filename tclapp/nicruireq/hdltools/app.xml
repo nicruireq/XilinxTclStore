@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<catalog>
+  <apps>
+    <app>
+      <name>hdltools</name>
+      <pkg_require>Vivado 2014.1</pkg_require>
+      <author>Nicolas Ruiz Requejo</author>
+      <company>nicruireq</company>
+      <company_display>nicruireq</company_display>
+      <summary>This a collection of utilities to generate component instantiation and testbench templates files for VHDL sources mainly</summary>
+      <display>HDL Tools</display>
+      <procs>
+        <proc>
+          <name>gui_run-vhdl_get_instantiation_template</name>
+          <summary/>
+        </proc>
+        <proc>
+          <name>gui_run-vhdl_get_testbench_template</name>
+          <summary/>
+        </proc>
+        <proc>
+          <name>install</name>
+          <summary/>
+        </proc>
+        <proc>
+          <name>uninstall</name>
+          <summary/>
+        </proc>
+        <proc>
+          <name>vhdl_get_template</name>
+          <summary/>
+        </proc>
+      </procs>
+    </app>
+  </apps>
+</catalog>

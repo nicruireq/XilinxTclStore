@@ -1,0 +1,11 @@
+component RAM_WF_93 is
+    generic ( datafile : string := "~/pruebas/mem.dat";
+              address_width : integer := 4; 
+              data_width : integer := 8);
+    Port ( DataIn : in  std_logic_vector(data_width-1 downto 0);
+           WE : in  std_logic;
+           Address : in  std_logic_vector(address_width-1 downto 0);
+           CLK : in  std_logic;
+           DataOut : out  std_logic_vector(data_width-1 downto 0)
+           );
+end component;

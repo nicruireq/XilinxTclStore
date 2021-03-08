@@ -1,0 +1,5 @@
+entity mock is
+    generic ( datafile : string := "~/pruebas/mem.dat";
+              address_width : integer := 4; 
+              data_width : integer := 8);
+end mock;

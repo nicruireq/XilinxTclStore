@@ -1,0 +1,5 @@
+entity mock is
+    Port (
+           A : out STD_LOGIC
+        );
+end mock;
