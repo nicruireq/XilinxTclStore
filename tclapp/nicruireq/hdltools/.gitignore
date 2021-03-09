@@ -7,6 +7,9 @@
 create_app_xml.tcl
 
 # other
+.Xil
+.xil
+*.wpc
 parser.tcl
 readfile.tcl
 *.html

@@ -8,7 +8,7 @@
 #
 ###############################################################################
 
-package require Vivado 1.2014.1
+package require Vivado 1.2018.1
 
 # tclapp/nicruireq/hdltools/gui_hooks.tcl
 namespace eval ::tclapp::nicruireq::hdltools {
@@ -30,13 +30,9 @@ proc ::tclapp::nicruireq::hdltools::gui_run-vhdl_get_instantiation_template {} {
     # gets selected source file from the gui
     set selected_vhd [lindex [get_selected_objects] 0]
     # we need to ensure that the vhdl code is syntactically
-    # correct then we launch the RTL elaboration,
-    # the Tcl API doesn't provide another fast method
-    if {[catch {
-        synth_design -rtl -rtl_skip_constraints -rtl_skip_ip
-        close_design
-    } rtl_error]} {
-        error " Error - check VHDL source files syntax: $rtl_error "
+    # correct then
+    if {![string equal [check_syntax -return_string] {}]} {
+        error " Error - check VHDL source files syntax and save them. "
     }
     # generate template
     set success {}
@@ -58,7 +54,7 @@ proc ::tclapp::nicruireq::hdltools::gui_run-vhdl_get_instantiation_template {} {
         # spaces
         eval add_files -norecurse "\"$template_path\""
     }
-    update_compile_order -fileset sources_1
+    #update_compile_order -fileset sources_1
 }
 
 proc ::tclapp::nicruireq::hdltools::gui_run-vhdl_get_testbench_template {} {
@@ -75,13 +71,9 @@ proc ::tclapp::nicruireq::hdltools::gui_run-vhdl_get_testbench_template {} {
     # gets selected source file from the gui
     set selected_vhd [lindex [get_selected_objects] 0]
     # we need to ensure that the vhdl code is syntactically
-    # correct then we launch the RTL elaboration,
-    # the Tcl API doesn't provide another fast method
-    if {[catch {
-        synth_design -rtl -rtl_skip_constraints -rtl_skip_ip
-        close_design
-    } rtl_error]} {
-        error " Error - check VHDL source files syntax: $rtl_error "
+    # correct then
+    if {![string equal [check_syntax -return_string] {}]} {
+        error " Error - check VHDL source files syntax and save them. "
     }
     # generate template
     set project_dir [get_property DIRECTORY [current_project]]
@@ -104,7 +96,7 @@ proc ::tclapp::nicruireq::hdltools::gui_run-vhdl_get_testbench_template {} {
         # spaces
         eval add_files -fileset sim_1 -norecurse "\"$template_path\""
     }
-    update_compile_order -fileset sim_1
+    #update_compile_order -fileset sim_1
 }
 
 proc ::tclapp::nicruireq::hdltools::install { args } {
@@ -120,12 +112,14 @@ proc ::tclapp::nicruireq::hdltools::install { args } {
         return -code ok
     }
     # button instantiation
+    set xilinx_tclapp_repo_path $::env(XILINX_TCLAPP_REPO)
     puts "INFO: Adding Vivado GUI button for the app"
     create_gui_custom_command -name "vhdlInstantiationTemplate" \
         -menu_name "Generate VHDL instantiation template" \
         -description "Generate VHDL instantiation template from\
                       selected source .vhd file in GUI" \
         -command "::tclapp::nicruireq::hdltools::gui_run-vhdl_get_instantiation_template" \
+        -toolbar_icon "$xilinx_tclapp_repo_path/tclapp/nicruireq/hdltools/icon/vhdl_instantiation.png" \
         -show_on_toolbar \
         -run_proc true
     # button testbench
@@ -135,6 +129,7 @@ proc ::tclapp::nicruireq::hdltools::install { args } {
         -description "Generate VHDL testbench template from\
                       selected source .vhd file in GUI" \
         -command "::tclapp::nicruireq::hdltools::gui_run-vhdl_get_testbench_template" \
+        -toolbar_icon "$xilinx_tclapp_repo_path/tclapp/nicruireq/hdltools/icon/vhdl_testbench.png" \
         -show_on_toolbar \
         -run_proc true
     return -code ok

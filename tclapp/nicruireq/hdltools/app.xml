@@ -3,7 +3,7 @@
   <apps>
     <app>
       <name>hdltools</name>
-      <pkg_require>Vivado 2014.1</pkg_require>
+      <pkg_require>Vivado 2018.1</pkg_require>
       <author>Nicolas Ruiz Requejo</author>
       <company>nicruireq</company>
       <company_display>nicruireq</company_display>
@@ -12,11 +12,11 @@
       <procs>
         <proc>
           <name>gui_run-vhdl_get_instantiation_template</name>
-          <summary/>
+          <summary>Launch the process to obtain VHDL instantiation template from a source file in the current project opened in GUI</summary>
         </proc>
         <proc>
           <name>gui_run-vhdl_get_testbench_template</name>
-          <summary/>
+          <summary>Launch the process to obtain VHDL testbench templates from a source file in the current project opened in GUI</summary>
         </proc>
         <proc>
           <name>install</name>
@@ -28,7 +28,7 @@
         </proc>
         <proc>
           <name>vhdl_get_template</name>
-          <summary/>
+          <summary>Generates VHDL instantiation or testbench templates</summary>
         </proc>
       </procs>
     </app>

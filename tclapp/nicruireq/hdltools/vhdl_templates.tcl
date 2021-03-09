@@ -8,7 +8,7 @@
 #
 ###############################################################################
 
-package require Vivado 1.2014.1
+package require Vivado 1.2018.1
 
 # tclapp/nicruireq/hdltools/vhdl_templates.tcl
 namespace eval ::tclapp::nicruireq::hdltools {
