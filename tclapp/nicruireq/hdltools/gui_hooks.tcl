@@ -87,16 +87,18 @@ proc ::tclapp::nicruireq::hdltools::gui_run-vhdl_get_testbench_template {} {
         error " Error - generating template failed: $template_error"
     }
 
+    set_property SOURCE_SET sources_1 [get_filesets sim_1]
+
     if {[regexp {\s+} $template_path]} {
         # if the dir string has spaces we need to eval
         # the command with the dir between double {{}}
-        eval add_files -fileset sim_1 -norecurse "{{$template_path}}"
+        eval add_files -fileset sim_1 "{{$template_path}}"
     } else {
         # this works only for dir strings don't contains
         # spaces
-        eval add_files -fileset sim_1 -norecurse "\"$template_path\""
+        eval add_files -fileset sim_1 "\"$template_path\""
     }
-    #update_compile_order -fileset sim_1
+    update_compile_order -fileset sim_1
 }
 
 proc ::tclapp::nicruireq::hdltools::install { args } {
