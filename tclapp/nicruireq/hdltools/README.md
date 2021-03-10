@@ -29,5 +29,4 @@ with these tasks:
 
 # Description of source files
 * vhdl_templates.tcl: implements utility to generate component instantiation template and testbench template from VHDL source files.
-* gui_hooks.tcl: implements procs to integrate utilities of this app within vivado gui. Also implements hook procs install and uninstall. 
-* 
+* gui_hooks.tcl: implements procs to integrate utilities of this app within vivado gui. Also implements hook procs install and uninstall.
